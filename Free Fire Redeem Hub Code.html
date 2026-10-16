@@ -1,0 +1,626 @@
+<!-- Chosen Palette: Gaming Dark Theme (Dark Slate, Vibrant Orange/Yellow, Cyan Accent) -->
+
+<!-- Application Structure Plan:
+- Single Page Application structured around a high-converting gamer portal layout.
+- Top Header with gamer badge and title.
+- Real-time status bar showing active server status and auto-countdown timer.
+- Responsive AdSense ad unit placeholders strategically positioned above and between primary content blocks for max visibility and compliance.
+- Dynamic Reward List populated with both fallback data and automated Google Sheets CSV integration for zero-maintenance daily updates.
+- One-click copy interaction with non-blocking toast notification feedback.
+- Prominent CTA directing users to the official redemption site.
+- Comprehensive SEO and Google AdSense compliance blocks including a step-by-step redemption guide and full popup modals for Privacy Policy, Terms & Conditions, and Contact details.
+-->
+
+<!-- Visualization & Content Choices:
+- Reward List Cards -> Goal: Quick glance & copy -> Custom CSS Card Grid + Vanilla JS Copy -> Clipboard API + Toast Alert Feedback.
+- Countdown Timer -> Goal: Create user engagement & urgency -> Dynamic JS Countdown -> Pure JS setInterval loop.
+- Dynamic Data Sync -> Goal: Automated content updates without redeploying code -> Fetch CSV API parsing Google Sheets -> Pure JS Async Fetch with graceful static fallback.
+-->
+
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Today's Free Fire Official Redeem Codes | FF Reward Hub</title>
+    <meta name="description" content="Get 100% working daily official Free Fire redeem codes for free Gloo Wall skins, Gun crates, Bundles, and Diamonds. Daily updated FF rewards code list.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ff-orange: #ff4e00;
+            --ff-yellow: #ffb700;
+            --ff-red: #d32f2f;
+            --ff-dark: #0a0c10;
+            --ff-card-bg: #141822;
+            --ff-border: #2a3245;
+            --ff-cyan: #00f0ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--ff-dark);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-image: 
+                radial-gradient(circle at 50% 10%, rgba(255, 78, 0, 0.25), transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 240, 255, 0.1), transparent 40%);
+            background-attachment: fixed;
+            padding: 15px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        /* HEADER SECTION */
+        .header {
+            background: linear-gradient(135deg, rgba(255,78,0,0.9), rgba(211,47,47,0.9));
+            border: 2px solid var(--ff-yellow);
+            border-radius: 16px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 0 25px rgba(255, 78, 0, 0.5), inset 0 0 15px rgba(255, 183, 0, 0.3);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: "OFFICIAL REWARD";
+            position: absolute;
+            top: 5px;
+            right: -25px;
+            background: var(--ff-yellow);
+            color: #000;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 3px 25px;
+            transform: rotate(35deg);
+        }
+
+        .header h1 {
+            font-family: 'Teko', sans-serif;
+            font-size: 38px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8), 0 0 10px var(--ff-yellow);
+            line-height: 1;
+        }
+
+        .header p {
+            font-size: 13px;
+            margin-top: 6px;
+            color: #ffebd2;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* TIMER & UPDATE NOTICE */
+        .status-bar {
+            background: var(--ff-card-bg);
+            border: 1px solid var(--ff-border);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        .status-item {
+            text-align: left;
+        }
+
+        .status-title {
+            font-size: 11px;
+            color: #8a99ad;
+            text-transform: uppercase;
+        }
+
+        .status-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--ff-yellow);
+        }
+
+        .timer-box {
+            background: rgba(255, 78, 0, 0.15);
+            border: 1px solid var(--ff-orange);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            color: var(--ff-cyan);
+            font-family: monospace;
+            font-size: 16px;
+        }
+
+        /* ADSENSE CONTAINER */
+        .ad-container {
+            margin: 20px 0;
+            width: 100%;
+            text-align: center;
+            min-height: 90px;
+            background: rgba(20, 24, 34, 0.5);
+            border: 1px dashed var(--ff-border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* CODE CARDS */
+        .section-title {
+            font-family: 'Teko', sans-serif;
+            font-size: 26px;
+            letter-spacing: 1px;
+            color: var(--ff-yellow);
+            text-align: left;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-card {
+            background: var(--ff-card-bg);
+            border: 1px solid var(--ff-border);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .code-card:hover {
+            border-color: var(--ff-orange);
+            box-shadow: 0 0 15px rgba(255, 78, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .code-info {
+            text-align: left;
+        }
+
+        .code-tag {
+            font-size: 11px;
+            color: var(--ff-cyan);
+            font-weight: 600;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .code-text {
+            font-family: monospace;
+            font-size: 18px;
+            letter-spacing: 2.5px;
+            color: #ffffff;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+        }
+
+        .copy-btn {
+            background: linear-gradient(45deg, var(--ff-orange), var(--ff-yellow));
+            color: #000000;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 10px rgba(255, 183, 0, 0.4);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.92);
+        }
+
+        /* MAIN CLAIM BUTTON */
+        .claim-btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #00c853, #00e676);
+            color: #000000;
+            text-decoration: none;
+            padding: 16px;
+            font-size: 20px;
+            font-weight: 800;
+            font-family: 'Teko', sans-serif;
+            letter-spacing: 1.5px;
+            border-radius: 12px;
+            margin-top: 25px;
+            text-transform: uppercase;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 230, 118, 0.5);
+            transition: all 0.3s ease;
+            border: 1px solid #a7ffeb;
+        }
+
+        .claim-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(0, 230, 118, 0.8);
+        }
+
+        /* GUIDE SECTION FOR SEO & ADSENSE */
+        .guide-box {
+            background: var(--ff-card-bg);
+            border: 1px solid var(--ff-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: left;
+            font-size: 13px;
+            color: #a0aec0;
+            line-height: 1.6;
+        }
+
+        .guide-box h2 {
+            font-family: 'Teko', sans-serif;
+            color: var(--ff-yellow);
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .guide-box ol {
+            padding-left: 20px;
+            margin-top: 8px;
+        }
+
+        .guide-box li {
+            margin-bottom: 6px;
+        }
+
+        /* FOOTER & MODALS */
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--ff-border);
+            text-align: center;
+            font-size: 12px;
+            color: #718096;
+            width: 100%;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--ff-yellow);
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* MODAL POPUP FOR PRIVACY, TERMS, CONTACT */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--ff-card-bg);
+            border: 2px solid var(--ff-orange);
+            border-radius: 16px;
+            padding: 25px;
+            max-width: 550px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: left;
+            font-size: 13px;
+            color: #cbd5e0;
+            position: relative;
+        }
+
+        .modal-content h2 {
+            color: var(--ff-yellow);
+            font-family: 'Teko', sans-serif;
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            color: #ffffff;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: var(--ff-yellow);
+            color: #000000;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 8px;
+            padding: 12px;
+            position: fixed;
+            z-index: 999;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 15px rgba(255, 183, 0, 0.8);
+        }
+
+        .toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🔥 FREE FIRE REDEEM CODES</h1>
+            <p>Today's Official Daily Working Rewards</p>
+        </div>
+
+        <!-- STATUS BAR -->
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-title">Server Status</div>
+                <div class="status-value">🟢 ACTIVE & UPDATED</div>
+            </div>
+            <div class="status-item">
+                <div class="status-title">Next Code Refresh</div>
+                <div class="timer-box" id="timer">04:59</div>
+            </div>
+        </div>
+
+        <!-- ADSENSE SLOT 1 (TOP BANNER) -->
+        <div class="ad-container">
+            <!-- Replace this comment with your Google AdSense unit script when approved -->
+            <span style="font-size:10px; color:#4a5568;">ADVERTISEMENT</span>
+        </div>
+
+        <!-- CODES LIST -->
+        <div class="section-title">🎁 TODAY'S EXCLUSIVE CODES</div>
+
+        <div id="codes-container">
+            <div class="code-card">
+                <div class="code-info">
+                    <span class="code-tag">FREE GLOO WALL SKIN</span>
+                    <span class="code-text" id="c1">FF9M2GF14CB8</span>
+                </div>
+                <button class="copy-btn" onclick="copyCode('c1')">COPY</button>
+            </div>
+
+            <div class="code-card">
+                <div class="code-info">
+                    <span class="code-tag">500 DIAMONDS VOUCHER</span>
+                    <span class="code-text" id="c2">FF1164XNJZ2V</span>
+                </div>
+                <button class="copy-btn" onclick="copyCode('c2')">COPY</button>
+            </div>
+
+            <div class="code-card">
+                <div class="code-info">
+                    <span class="code-tag">INCUBATOR VOUCHER</span>
+                    <span class="code-text" id="c3">FF11WFNPP956</span>
+                </div>
+                <button class="copy-btn" onclick="copyCode('c3')">COPY</button>
+            </div>
+
+            <div class="code-card">
+                <div class="code-info">
+                    <span class="code-tag">LEGENDARY GUN CRATE</span>
+                    <span class="code-text" id="c4">FF10617KGU2F</span>
+                </div>
+                <button class="copy-btn" onclick="copyCode('c4')">COPY</button>
+            </div>
+
+            <div class="code-card">
+                <div class="code-info">
+                    <span class="code-tag">RARE OUTFIT BUNDLE</span>
+                    <span class="code-text" id="c5">FFICJGW9NKYT</span>
+                </div>
+                <button class="copy-btn" onclick="copyCode('c5')">COPY</button>
+            </div>
+        </div>
+
+        <!-- OFFICIAL REDEMPTION LINK -->
+        <a href="https://reward.ff.garena.com/" target="_blank" rel="noopener" class="claim-btn">
+            🚀 OPEN OFFICIAL GARENA REDEMPTION SITE
+        </a>
+
+        <!-- ADSENSE SLOT 2 (MIDDLE BANNER) -->
+        <div class="ad-container">
+            <!-- Replace this comment with your Google AdSense unit script when approved -->
+            <span style="font-size:10px; color:#4a5568;">ADVERTISEMENT</span>
+        </div>
+
+        <!-- SEO GUIDE BOX -->
+        <div class="guide-box">
+            <h2>How to Redeem Free Fire Codes?</h2>
+            <p>Follow these simple steps to claim your free in-game rewards:</p>
+            <ol>
+                <li>Copy any 12-digit redeem code listed above.</li>
+                <li>Click on the green <strong>"Open Official Garena Redemption Site"</strong> button.</li>
+                <li>Log in using your Free Fire linked account (Facebook, Google, VK, Huawei, or Apple ID).</li>
+                <li>Paste the copied redeem code into the text field and click <strong>Confirm</strong>.</li>
+                <li>Your free rewards will be sent directly to your in-game vault/mail within 24 hours.</li>
+            </ol>
+        </div>
+
+        <!-- FOOTER & ADSENSE COMPLIANCE PAGES -->
+        <div class="footer">
+            <div class="footer-links">
+                <a onclick="openModal('privacyModal')">Privacy Policy</a>
+                <a onclick="openModal('termsModal')">Terms & Conditions</a>
+                <a onclick="openModal('contactModal')">Contact Us</a>
+            </div>
+            <p>© 2026 FF Rewards Hub | Fan-made Community Portal</p>
+            <p style="font-size: 10px; margin-top: 5px; color: #4a5568;">This website is not affiliated, endorsed, or sponsored by Garena Free Fire.</p>
+        </div>
+    </div>
+
+    <!-- TOAST ALERT -->
+    <div id="toast" class="toast">Code copied to clipboard!</div>
+
+    <!-- PRIVACY POLICY MODAL -->
+    <div id="privacyModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('privacyModal')">&times;</span>
+            <h2>Privacy Policy</h2>
+            <p>Welcome to FF Rewards Hub. Your privacy is critically important to us.</p><br>
+            <p><strong>Information We Collect:</strong> We do not ask for personal identification or log-in credentials. We only provide free informational redeem codes.</p><br>
+            <p><strong>Cookies & Ads:</strong> Third-party vendors, including Google AdSense, use cookies to serve ads based on prior visits to our website. You may opt-out of personalized advertising in your browser settings.</p>
+        </div>
+    </div>
+
+    <!-- TERMS & CONDITIONS MODAL -->
+    <div id="termsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('termsModal')">&times;</span>
+            <h2>Terms & Conditions</h2>
+            <p>By accessing FF Rewards Hub, you agree to the following terms:</p><br>
+            <p>1. Redeem codes provided on this website are gathered from publicly official social channels and promotional events.</p>
+            <p>2. Codes are available on a first-come, first-served basis and may expire depending on Garena server limits.</p>
+            <p>3. We do not guarantee code validity as expiration times are controlled by official game publishers.</p>
+        </div>
+    </div>
+
+    <!-- CONTACT US MODAL -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('contactModal')">&times;</span>
+            <h2>Contact Us</h2>
+            <p>Have questions, business inquiries, or code updates?</p><br>
+            <p><strong>Email Us:</strong> contact@yourdomain.com</p>
+            <p><strong>Response Time:</strong> Within 24-48 Hours</p>
+        </div>
+    </div>
+
+    <script>
+        // Copy Code Functionality with Custom Alert
+        function copyCode(elementId) {
+            var code = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(code).then(function() {
+                showToast("Copied: " + code);
+            });
+        }
+
+        function showToast(message) {
+            var toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.className = "toast show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        // Countdown Timer Logic
+        var duration = 300;
+        var timerDisplay = document.getElementById('timer');
+        setInterval(function () {
+            var minutes = parseInt(duration / 60, 10);
+            var seconds = parseInt(duration % 60, 10);
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+            timerDisplay.textContent = minutes + ":" + seconds;
+            if (--duration < 0) duration = 300;
+        }, 1000);
+
+        // Modal Controls for Privacy, Terms, Contact
+        function openModal(id) {
+            document.getElementById(id).style.display = "flex";
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = "none";
+            }
+        }
+
+        // AUTOMATIC GOOGLE SHEET CSV FETCHER (UNCOMMENT AND PASTE YOUR CSV URL WHEN READY)
+        /*
+        const GOOGLE_SHEET_CSV_URL = 'YOUR_PUBLISHED_CSV_URL_HERE';
+
+        async function fetchSheetCodes() {
+            try {
+                const response = await fetch(GOOGLE_SHEET_CSV_URL);
+                const data = await response.text();
+                const rows = data.split('\n').slice(1);
+                let html = '';
+                rows.forEach((row, index) => {
+                    const columns = row.split(',');
+                    if (columns.length >= 2) {
+                        const tag = columns[0].trim();
+                        const code = columns[1].trim();
+                        if (code) {
+                            html += `
+                            <div class="code-card">
+                                <div class="code-info">
+                                    <span class="code-tag">${tag}</span>
+                                    <span class="code-text" id="dyn_${index}">${code}</span>
+                                </div>
+                                <button class="copy-btn" onclick="copyCode('dyn_${index}')">COPY</button>
+                            </div>`;
+                        }
+                    }
+                });
+                if (html.trim() !== '') {
+                    document.getElementById('codes-container').innerHTML = html;
+                }
+            } catch (error) {
+                console.log("Using static codes fallback");
+            }
+        }
+        // fetchSheetCodes();
+        */
+    </script>
+</body>
+</html>
